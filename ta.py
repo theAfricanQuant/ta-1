@@ -52,11 +52,7 @@ def ema(s, n, wilder=False):
 def macd(s, nfast=12, nslow=26, nsig=9, percent=True):
     fast, slow = ema(s, nfast), ema(s, nslow)
 
-    if percent:
-        macd = 100*(fast / slow - 1)
-    else:
-        macd = fast - slow
-
+    macd = 100*(fast / slow - 1) if percent else fast - slow
     sig = ema(macd, nsig)
     hist = macd - sig
 
@@ -310,7 +306,6 @@ def zigzag(s, pct=5):
                 tr = 1
             elif cl / lp < dt:
                 tr = -1
-        # Trend is up
         elif tr == 1:
             # New high
             if ch > lp:
@@ -321,17 +316,13 @@ def zigzag(s, pct=5):
                 zzp.append(lp)
 
                 tr, ld, lp = -1, ix, cl
-        # Trend is down
-        else:
-            # New low
-            if cl < lp:
-                ld, lp = ix, cl
-            # Reversal
-            elif ch / lp > ut:
-                zzd.append(ld)
-                zzp.append(lp)
+        elif cl < lp:
+            ld, lp = ix, cl
+        elif ch / lp > ut:
+            zzd.append(ld)
+            zzp.append(lp)
 
-                tr, ld, lp = 1, ix, ch
+            tr, ld, lp = 1, ix, ch
 
     # Extrapolate the current trend
     if zzd[-1] != s.index[-1]:
